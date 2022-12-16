@@ -30,13 +30,29 @@
             let identifier = window.location.hash;
             if (identifier.length > 1) {
                 identifier = identifier.substr(1);
+                // base 64
+                let hidden = identifier.startsWith(":");
+                if (hidden) {
+                    identifier = atob(identifier.substr(1));
+                }
                 if (identifier.startsWith("@") && identifier.includes("@", 2)) {
                     let split = identifier.split("@");
                     if (split.length > 2) {
                         let account = split[1];
                         let instance = split[2];
-                        document.getElementById("content").innerText = "Redirecting to " + identifier;
-                        window.location.replace("https://" + instance + "/@" + account)
+                        let link = "https://" + instance + "/@" + account;
+                        let mainEle = document.getElementById("main");
+                        if (hidden) {
+                            mainEle.innerText = "This hidden URL points to " + identifier;
+                            let linkEle = document.createElement("a");
+                            linkEle.href = link;
+                            linkEle.innerText = "Click to visit profile";
+                            mainEle.innerText = mainEle.innerText + " ";
+                            mainEle.insertAdjacentElement("afterend", linkEle);
+                        } else {
+                            mainEle.innerText = "This URL points to " + identifier;
+                            window.location.replace(link)
+                        }
                         return;
                     }
                 }
@@ -49,26 +65,29 @@
             let identifier = document.getElementById("inputidentifier").value;
             if (identifier.length > 0) {
                 // address style
+                let append = null;
                 if (identifier.startsWith("@") && identifier.includes("@", 2)) {
                     let split = identifier.split("@");
                     if (split.length > 2) {
-                        let link = window.location.href.split("#")[0] + "#" + identifier;
-                        document.getElementById("info").innerText = "";
-                        document.getElementById("link").href = link;
-                        document.getElementById("link").innerText = link;
-                        return;
+                        append = window.location.href.split("#")[0] + "#" + identifier;
                     }
                 // url
                 } else if (identifier.startsWith("https://") && identifier.includes("/@")) {
                     identifier = identifier.substr("https://".length);
                     let split = identifier.split("/@");
                     if (split.length > 1) {
-                        let link = window.location.href.split("#")[0] + "#@" + split[1] + "@" + split[0];
-                        document.getElementById("info").innerText = "";
-                        document.getElementById("link").href = link;
-                        document.getElementById("link").innerText = link;
-                        return;
+                        append = "@" + split[1] + "@" + split[0];
                     }
+                }
+                if (append != null) {
+                    if (document.getElementById("identifierbase64").checked) {
+                        append = ":" + btoa(append);
+                    }
+                    let link = window.location.href.split("#")[0] + "#" + append;
+                    document.getElementById("info").innerText = "";
+                    document.getElementById("link").href = link;
+                    document.getElementById("link").innerText = link;
+                    return;
                 }
                 document.getElementById("info").innerText = "Invalid username '" + identifier + "' provided! Make sure to include the instance! It should look something like this: @the_moep@social.tchncs.de"
             } else {
@@ -104,8 +123,8 @@
             border: 0;
             cursor: pointer;
         }
-        input {
-            width: 210px;
+        #inputidentifier {
+            width: 190px;
             color: #fff;
             padding: 10px;
             font-size: 14px;
@@ -117,6 +136,13 @@
             position: relative;
             top: 1px;
             transition: border-color .3s linear;
+        }
+        #identifierbase64, #identifierbase64 + label {
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         input:focus, input:active {
             border-color: #8c8dff;
@@ -130,10 +156,15 @@
 </head>
 <body>
 <div id="content">
-    <p>Input your address to generate redirect link:</p>
-    <form id="identifierform"><input id="inputidentifier" spellcheck="false" type="text" placeholder="Input address"> <button>Create Link</button></form>
-    <p><span id="info"></span><a id="link"></a></p>
-    <p id="credit">Created by <a target="_blank" href="#@the_moep@social.tchncs.de">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
+    <div id="main">
+        <p>Input your address to generate redirect link:</p>
+        <form id="identifierform">
+            <p><input id="inputidentifier" spellcheck="false" type="text" placeholder="Input address"> <button>Create Link</button></p>
+            <p><input id="identifierbase64" type="checkbox"> <label for="identifierbase64">Hide address</label></p>
+        </form>
+        <p><span id="info"></span><a id="link"></a></p>
+        <p id="credit">Created by <a target="_blank" href="#@the_moep@social.tchncs.de">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
+    </div>
 </div>
 <script>handle();</script>
 </body>
