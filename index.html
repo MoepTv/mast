@@ -73,6 +73,11 @@
         function generateLink(e) {
             e.preventDefault();
             let identifier = document.getElementById("inputidentifier").value;
+            let infoEle = document.getElementById("info");
+            infoEle.innerText = "";
+            let linkEle = document.getElementById("link");
+            linkEle.href = "";
+            linkEle.innerText = "";
             if (identifier.length > 0) {
                 // address style
                 let append = null;
@@ -96,14 +101,13 @@
                         append = append.replace("=", "_");
                     }
                     let link = window.location.href.split("#")[0] + "#" + append;
-                    document.getElementById("info").innerText = "";
-                    document.getElementById("link").href = link;
-                    document.getElementById("link").innerText = link;
+                    linkEle.href = link;
+                    linkEle.innerText = link;
                     return;
                 }
-                document.getElementById("info").innerText = "Invalid username '" + identifier + "' provided! Make sure to include the instance! It should look something like this: @the_moep@social.tchncs.de"
+                infoEle.innerText = "Invalid username '" + identifier + "' provided! Make sure to include the instance! It should look something like this: @the_moep@social.tchncs.de"
             } else {
-                document.getElementById("info").innerText = "No username provided!"
+                dinfoEle.innerText = "No username provided!"
             }
         }
 
@@ -124,6 +128,9 @@
             padding: 20px;
             background-color: #31333E;
             border-radius: 4px;
+        }
+        #info {
+            max-width: 420px;
         }
         button, #note a {
             color: #fff;
@@ -180,7 +187,7 @@
             <p><input id="inputidentifier" spellcheck="false" type="text" placeholder="Input address"> <button>Create Link</button></p>
             <p title="This will translate the account to Base64 and display a splash page instead of directly redirecting."><input id="identifierbase64" type="checkbox"> <label for="identifierbase64">Hide address</label></p>
         </form>
-        <p><span id="info"></span><a id="link"></a></p>
+        <div id="info"></div><a id="link"></a>
         <p id="credit">Created by <a href="#:QHRoZV9tb2VwQHNvY2lhbC50Y2huY3MuZGU=">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
     </div>
     <div id="note"></div>
