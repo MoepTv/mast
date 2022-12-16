@@ -37,9 +37,8 @@
                 // base 64
                 let hidden = identifier.startsWith(":");
                 if (hidden) {
-                    identifier = atob(identifier.substr(1));
-                    // automatic linking doesn't like trailing equal signs
-                    identifier = identifier.replace("_", "=");
+                    // remove underscores that were added as padding at some point
+                    identifier = atob(identifier.substr(1).replace("_", ""));
                 }
                 mainEle.style.display = "none";
                 noteEle.style.display = "inherit";
@@ -99,7 +98,7 @@
                     if (document.getElementById("identifierbase64").checked) {
                         append = ":" + btoa(append);
                         // automatic linking doesn't like trailing equal signs
-                        append = append.replace("=", "_");
+                        append = append.replace("=", "");
                     }
                     let link = window.location.href.split("#")[0] + "#" + append;
                     linkEle.href = link;
