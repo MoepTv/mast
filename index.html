@@ -69,7 +69,7 @@
                 if (identifier.startsWith("@") && identifier.includes("@", 2)) {
                     let split = identifier.split("@");
                     if (split.length > 2) {
-                        append = window.location.href.split("#")[0] + "#" + identifier;
+                        append = identifier;
                     }
                 // url
                 } else if (identifier.startsWith("https://") && identifier.includes("/@")) {
@@ -94,6 +94,8 @@
                 document.getElementById("info").innerText = "No username provided!"
             }
         }
+
+        addEventListener('hashchange', () => handle());
     </script>
     <style>
         body {
@@ -163,7 +165,7 @@
             <p><input id="identifierbase64" type="checkbox"> <label for="identifierbase64">Hide address</label></p>
         </form>
         <p><span id="info"></span><a id="link"></a></p>
-        <p id="credit">Created by <a target="_blank" href="#@the_moep@social.tchncs.de">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
+        <p id="credit">Created by <a href="#:QHRoZV9tb2VwQHNvY2lhbC50Y2huY3MuZGU=">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
     </div>
 </div>
 <script>handle();</script>
