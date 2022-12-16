@@ -27,6 +27,9 @@
     <script>
         function handle() {
             document.getElementById("identifierform").addEventListener("submit", generateLink, true);
+
+            let mainEle = document.getElementById("main");
+            let noteEle = document.getElementById("note");
             let identifier = window.location.hash;
             if (identifier.length > 1) {
                 identifier = identifier.substr(1);
@@ -35,28 +38,33 @@
                 if (hidden) {
                     identifier = atob(identifier.substr(1));
                 }
+                mainEle.style.display = "none";
+                noteEle.style.display = "inherit";
                 if (identifier.startsWith("@") && identifier.includes("@", 2)) {
                     let split = identifier.split("@");
                     if (split.length > 2) {
                         let account = split[1];
                         let instance = split[2];
                         let link = "https://" + instance + "/@" + account;
-                        let mainEle = document.getElementById("main");
                         if (hidden) {
-                            mainEle.innerText = "This hidden URL points to " + identifier;
+                            noteEle.innerText = "This hidden URL points to " + identifier;
+                            noteEle.insertAdjacentElement("beforeend", document.createElement("br"));
                             let linkEle = document.createElement("a");
                             linkEle.href = link;
                             linkEle.innerText = "Click to visit profile";
-                            mainEle.innerText = mainEle.innerText + " ";
-                            mainEle.insertAdjacentElement("afterend", linkEle);
+                            noteEle.innerText = noteEle.innerText + " ";
+                            noteEle.insertAdjacentElement("beforeend", linkEle);
                         } else {
-                            mainEle.innerText = "This URL points to " + identifier;
-                            window.location.replace(link)
+                            window.location.replace(link);
                         }
                         return;
                     }
                 }
-                document.getElementById("content").innerText = "Invalid username '" + identifier + "' provided!"
+                noteEle.innerText = "Invalid username '" + identifier + "' provided!";
+            } else {
+                mainEle.style.display = "inherit";
+                noteEle.style.display = "none";
+                noteEle.innerHTML = "";
             }
         }
 
@@ -114,7 +122,7 @@
             border-radius: 4px;
             max-width: 400px;
         }
-        button {
+        button, #note a {
             color: #fff;
             background-color: #595aff;
             border-radius: 4px;
@@ -124,6 +132,11 @@
             padding: 10px 18px;
             border: 0;
             cursor: pointer;
+        }
+        #note a {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
         }
         #inputidentifier {
             width: 190px;
@@ -162,11 +175,12 @@
         <p>Input your address to generate redirect link:</p>
         <form id="identifierform">
             <p><input id="inputidentifier" spellcheck="false" type="text" placeholder="Input address"> <button>Create Link</button></p>
-            <p><input id="identifierbase64" type="checkbox"> <label for="identifierbase64">Hide address</label></p>
+            <p title="This will translate the account to Base64 and display a splash page instead of directly redirecting."><input id="identifierbase64" type="checkbox"> <label for="identifierbase64">Hide address</label></p>
         </form>
         <p><span id="info"></span><a id="link"></a></p>
         <p id="credit">Created by <a href="#:QHRoZV9tb2VwQHNvY2lhbC50Y2huY3MuZGU=">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
     </div>
+    <div id="note"></div>
 </div>
 <script>handle();</script>
 </body>
