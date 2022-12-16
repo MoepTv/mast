@@ -27,6 +27,7 @@
     <script>
         function handle() {
             document.getElementById("identifierform").addEventListener("submit", generateLink, true);
+            document.getElementById("identifierbase64").addEventListener("change", generateLink, true);
 
             let mainEle = document.getElementById("main");
             let noteEle = document.getElementById("note");
