@@ -37,6 +37,8 @@
                 let hidden = identifier.startsWith(":");
                 if (hidden) {
                     identifier = atob(identifier.substr(1));
+                    // automatic linking doesn't like trailing equal signs
+                    identifier = identifier.replace("_", "=");
                 }
                 mainEle.style.display = "none";
                 noteEle.style.display = "inherit";
@@ -90,6 +92,8 @@
                 if (append != null) {
                     if (document.getElementById("identifierbase64").checked) {
                         append = ":" + btoa(append);
+                        // automatic linking doesn't like trailing equal signs
+                        append = append.replace("=", "_");
                     }
                     let link = window.location.href.split("#")[0] + "#" + append;
                     document.getElementById("info").innerText = "";
