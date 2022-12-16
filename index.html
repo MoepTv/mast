@@ -1,0 +1,140 @@
+<html>
+<!--
+ Federated social acount redirector
+ LICENSE: GNU Affero General Public License, version 3 (AGPLv3)
+ Copyright (C) 2022 Max Lee aka The Moep (max@themoep.de)
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<head>
+    <meta charset=utf-8>
+    <title>Federated social acount redirector</title>
+    <link rel='shortcut icon' href="favicon.ico" type="image/x-icon" />
+    <link rel='shortcut icon' href="favicon.png" type="image/png" />
+    <link rel="image_src" type="image/png" href="favicon.png" title="mast.moep.tv icon"/>
+    <meta name="description" content="Moep.tv social redirector tool by Max Lee. (aka Phoenix616 & The Moep) - Licensed under AGPLv3"/>
+    <script>
+        function handle() {
+            document.getElementById("identifierform").addEventListener("submit", generateLink, true);
+            let identifier = window.location.hash;
+            if (identifier.length > 1) {
+                identifier = identifier.substr(1);
+                if (identifier.startsWith("@") && identifier.includes("@", 2)) {
+                    let split = identifier.split("@");
+                    if (split.length > 2) {
+                        let account = split[1];
+                        let instance = split[2];
+                        document.getElementById("content").innerText = "Redirecting to " + identifier;
+                        window.location.replace("https://" + instance + "/@" + account)
+                        return;
+                    }
+                }
+                document.getElementById("content").innerText = "Invalid username '" + identifier + "' provided!"
+            }
+        }
+
+        function generateLink(e) {
+            e.preventDefault();
+            let identifier = document.getElementById("inputidentifier").value;
+            if (identifier.length > 0) {
+                // address style
+                if (identifier.startsWith("@") && identifier.includes("@", 2)) {
+                    let split = identifier.split("@");
+                    if (split.length > 2) {
+                        let link = window.location.href.split("#")[0] + "#" + identifier;
+                        document.getElementById("info").innerText = "";
+                        document.getElementById("link").href = link;
+                        document.getElementById("link").innerText = link;
+                        return;
+                    }
+                // url
+                } else if (identifier.startsWith("https://") && identifier.includes("/@")) {
+                    identifier = identifier.substr("https://".length);
+                    let split = identifier.split("/@");
+                    if (split.length > 1) {
+                        let link = window.location.href.split("#")[0] + "#@" + split[1] + "@" + split[0];
+                        document.getElementById("info").innerText = "";
+                        document.getElementById("link").href = link;
+                        document.getElementById("link").innerText = link;
+                        return;
+                    }
+                }
+                document.getElementById("info").innerText = "Invalid username '" + identifier + "' provided! Make sure to include the instance! It should look something like this: @the_moep@social.tchncs.de"
+            } else {
+                document.getElementById("info").innerText = "No username provided!"
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #191A20;
+            text-align: center;
+            color: #fff;
+        }
+        a, a:visited {
+            color: #8c8dff;
+        }
+        #content {
+            display: inline-block;
+            padding: 20px;
+            background-color: #31333E;
+            border-radius: 4px;
+            max-width: 400px;
+        }
+        button {
+            color: #fff;
+            background-color: #595aff;
+            border-radius: 4px;
+            flex: 0 auto;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border: 0;
+            cursor: pointer;
+        }
+        input {
+            width: 210px;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+            background: #131419;
+            border: 1px solid #0a0b0e;
+            border-radius: 4px;
+            align-items: center;
+            padding-right: 4px;
+            position: relative;
+            top: 1px;
+            transition: border-color .3s linear;
+        }
+        input:focus, input:active {
+            border-color: #8c8dff;
+            background: #17191f;
+        }
+        #credit {
+            color: gray;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <p>Input your address to generate redirect link:</p>
+    <form id="identifierform"><input id="inputidentifier" spellcheck="false" type="text" placeholder="Input address"> <button>Create Link</button></form>
+    <p><span id="info"></span><a id="link"></a></p>
+    <p id="credit">Created by <a target="_blank" href="#@the_moep@social.tchncs.de">Max Lee</a> - Licensed under <a href="https://github.com/MoepTv/mast/blob/main/LICENSE">AGPLv3</a> - <a href="https://github.com/MoepTv/mast/">Source</a></p>
+</div>
+<script>handle();</script>
+</body>
+</html>
