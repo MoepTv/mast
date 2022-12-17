@@ -24,8 +24,9 @@
     <link rel='shortcut icon' href="favicon.png" type="image/png" />
     <link rel="image_src" type="image/png" href="favicon.png" title="mast.moep.tv icon"/>
     <meta name="description" content="Moep.tv social redirector tool by Max Lee. (aka Phoenix616 & The Moep) - Licensed under AGPLv3"/>
+    <script src="moderation.js" type="text/javascript"></script>
     <script>
-        function handle() {
+        async function handle() {
             document.getElementById("identifierform").addEventListener("submit", generateLink, true);
             document.getElementById("identifierbase64").addEventListener("change", generateLink, true);
 
@@ -47,13 +48,32 @@
                     if (split.length > 2) {
                         let account = split[1];
                         let instance = split[2];
+                        let moderationInfo = await getInfo(instance);
+                        if (moderationInfo !== undefined && moderationInfo.status === "suspended") {
+                            if (hidden) {
+                                noteEle.innerText = "This hidden URL points to instance '" + instance + "' which is blocked! Reason: '" + moderationInfo.reason + "'";
+                            } else {
+                                noteEle.innerText = "Instance '" + instance + "' is blocked! Reason: '" + moderationInfo.reason + "'";
+                            }
+                            return;
+                        }
+                        let limited = moderationInfo !== undefined && moderationInfo.status === "limited";
                         let link = "https://" + instance + "/@" + account;
-                        if (hidden) {
-                            noteEle.innerText = "This hidden URL points to " + identifier;
+                        if (hidden || limited) {
+                            noteEle.innerText = "";
+                            if (hidden) {
+                                noteEle.innerText = "This hidden URL points to " + identifier;
+                            }
+                            if (limited) {
+                                if (noteEle.innerText.length > 0) {
+                                    noteEle.innerHTML += "<br>";
+                                }
+                                noteEle.innerHTML += "There is a warning about the server this account is on: '" + moderationInfo.reason + "'";
+                            }
                             noteEle.insertAdjacentElement("beforeend", document.createElement("br"));
                             let linkEle = document.createElement("a");
                             linkEle.href = link;
-                            linkEle.innerText = "Click to visit profile";
+                            linkEle.innerText = "Visit profile";
                             noteEle.innerText = noteEle.innerText + " ";
                             noteEle.insertAdjacentElement("beforeend", linkEle);
                         } else {
@@ -70,7 +90,7 @@
             }
         }
 
-        function generateLink(e) {
+        async function generateLink(e) {
             e.preventDefault();
             let identifier = document.getElementById("inputidentifier").value;
             let infoEle = document.getElementById("info");
@@ -81,20 +101,28 @@
             if (identifier.length > 0) {
                 // address style
                 let append = null;
+                let instance = null;
                 if (identifier.startsWith("@") && identifier.includes("@", 2)) {
                     let split = identifier.split("@");
                     if (split.length > 2) {
                         append = identifier;
+                        instance = split[2];
                     }
-                // url
+                    // url
                 } else if (identifier.startsWith("https://") && identifier.includes("/@")) {
                     identifier = identifier.substr("https://".length);
                     let split = identifier.split("/@");
                     if (split.length > 1) {
-                        append = "@" + split[1] + "@" + split[0];
+                        instance = split[0];
+                        append = "@" + split[1] + "@" + instance;
                     }
                 }
                 if (append != null) {
+                    let moderationInfo = await getInfo(instance);
+                    if (moderationInfo !== undefined && moderationInfo.status === "suspended") {
+                        infoEle.innerText = "Instance '" + instance + "' is blocked! Reason: '" + moderationInfo.reason + "'";
+                        return;
+                    }
                     if (document.getElementById("identifierbase64").checked) {
                         append = ":" + btoa(append);
                         // automatic linking doesn't like trailing equal signs
@@ -123,6 +151,9 @@
         a, a:visited {
             color: #8c8dff;
         }
+        a:hover {
+            color: #a5a6fa;
+        }
         #content {
             display: inline-block;
             padding: 20px;
@@ -142,6 +173,9 @@
             padding: 10px 18px;
             border: 0;
             cursor: pointer;
+        }
+        button:hover, #note a:hover {
+            background-color: #6364ff;
         }
         #note a {
             display: inline-block;
